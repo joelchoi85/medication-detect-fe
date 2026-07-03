@@ -1,0 +1,97 @@
+"use client";
+
+import { colorForClass } from "@/lib/colors";
+import type { Detection } from "@/lib/types";
+
+interface DetectionOverlayProps {
+  imageUrl: string;
+  /** 원본 이미지 픽셀 크기 (박스 좌표계와 동일) */
+  width: number;
+  height: number;
+  detections: Detection[];
+  activeIndex: number | null;
+  onSelect: (index: number | null) => void;
+}
+
+// 원본 이미지 픽셀 좌표계를 그대로 SVG viewBox로 사용하므로, 컨테이너가 리사이즈되어도
+// JS로 크기를 재계산할 필요 없이 박스가 항상 이미지 위에 정확히 겹쳐진다.
+export function DetectionOverlay({
+  imageUrl,
+  width,
+  height,
+  detections,
+  activeIndex,
+  onSelect,
+}: DetectionOverlayProps) {
+  return (
+    <div
+      className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/5"
+      style={{ aspectRatio: `${width} / ${height}` }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- 사용자가 업로드한 임의 크기의 blob 이미지라 next/image 최적화 대상이 아님 */}
+      <img
+        src={imageUrl}
+        alt="업로드한 경구약제 이미지"
+        width={width}
+        height={height}
+        className="absolute inset-0 h-full w-full object-contain"
+      />
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="absolute inset-0 h-full w-full"
+        role="img"
+        aria-label={`검출된 알약 ${detections.length}개 표시`}
+      >
+        {detections.map((detection, index) => {
+          const [x1, y1, x2, y2] = detection.box;
+          const isActive = activeIndex === index;
+          const color = colorForClass(detection.class_id);
+          const strokeWidth = Math.max(width, height) / 250;
+          return (
+            <g
+              key={`${detection.class_id}-${index}`}
+              className="cursor-pointer"
+              tabIndex={0}
+              role="button"
+              aria-label={`${detection.class_name}, 신뢰도 ${(detection.confidence * 100).toFixed(1)}퍼센트`}
+              onMouseEnter={() => onSelect(index)}
+              onMouseLeave={() => onSelect(null)}
+              onFocus={() => onSelect(index)}
+              onBlur={() => onSelect(null)}
+            >
+              <rect
+                x={x1}
+                y={y1}
+                width={Math.max(0, x2 - x1)}
+                height={Math.max(0, y2 - y1)}
+                fill="none"
+                stroke={color}
+                strokeWidth={isActive ? strokeWidth * 1.8 : strokeWidth}
+                rx={width / 200}
+                style={{ transition: "stroke-width 120ms ease-out" }}
+              />
+              <rect
+                x={x1}
+                y={Math.max(0, y1 - height / 22)}
+                width={Math.min(width - x1, detection.class_name.length * (width / 45) + width / 40)}
+                height={height / 22}
+                fill={color}
+                opacity={isActive ? 1 : 0.85}
+              />
+              <text
+                x={x1 + width / 200}
+                y={Math.max(height / 26, y1 - height / 22 + height / 28)}
+                fontSize={height / 32}
+                fill="#ffffff"
+                style={{ fontWeight: 600 }}
+              >
+                {detection.class_name}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
