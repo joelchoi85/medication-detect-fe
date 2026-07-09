@@ -133,7 +133,7 @@ export function PillDetector() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="rounded-full border border-black/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-black/[.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-white/15 dark:hover:bg-white/[.05] dark:focus-visible:ring-offset-black"
+                className="rounded-full border border-black/15 px-4 py-2 text-sm font-medium transition-colors hover:bg-black/3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-white/15 dark:hover:bg-white/5 dark:focus-visible:ring-offset-black"
               >
                 다른 이미지 선택
               </button>
