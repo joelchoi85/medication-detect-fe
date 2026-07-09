@@ -13,9 +13,10 @@ type Status = "loading" | "success" | "error";
 
 const FIELDS: Array<{ key: keyof DrugInfo; label: string }> = [
   { key: "efficacy", label: "효능" },
-  { key: "usage", label: "사용법" },
+  { key: "usage", label: "용법" },
+  { key: "administration", label: "투약방법/기간" },
   { key: "warning", label: "사용 전 주의사항" },
-  { key: "precautions", label: "사용상 주의사항" },
+  { key: "precautions", label: "주의사항" },
   { key: "interactions", label: "상호작용" },
   { key: "sideEffects", label: "이상반응" },
   { key: "storage", label: "보관법" },
@@ -97,6 +98,11 @@ export function DrugInfoPanel({ detection, onClose }: DrugInfoPanelProps) {
 
         {status === "success" && data && (
           <div className="flex flex-col gap-4">
+            {data.isPrescriptionOnly && (
+              <p className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-700 dark:text-amber-400">
+                전문의약품(처방약)입니다. 아래 정보는 참고용이며, 실제 복용 여부와 방법은 처방한 의사 또는 조제한 약사와 상담하세요.
+              </p>
+            )}
             {data.entpName && <p className="text-sm text-foreground/60">{data.entpName}</p>}
             {FIELDS.filter(({ key }) => data[key]).map(({ key, label }) => (
               <div key={key} className="flex flex-col gap-1">
@@ -107,7 +113,9 @@ export function DrugInfoPanel({ detection, onClose }: DrugInfoPanelProps) {
               </div>
             ))}
             <p className="text-xs text-foreground/40">
-              출처: 식품의약품안전처 의약품개요정보(e약은요) — 일반의약품만 제공됩니다.
+              {data.source === "nedrug"
+                ? "출처: 식품의약품안전처 의약품안전나라 첨부문서 — 전문의약품 포함 전체 허가 품목."
+                : "출처: 식품의약품안전처 의약품개요정보(e약은요) — 일반의약품만 제공됩니다."}
             </p>
           </div>
         )}

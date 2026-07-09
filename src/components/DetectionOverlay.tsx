@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { colorForClass } from "@/lib/colors";
 import type { Detection } from "@/lib/types";
 
@@ -50,6 +50,19 @@ export function DetectionOverlay({
     );
   }, [detections]);
 
+  // SVG는 z-index가 없고 그린 순서(DOM 순서)로 위아래가 결정된다. 박스가 서로 겹칠 때
+  // 호버 중인 라벨이 다른 라벨에 가려지지 않도록, 활성화된 항목을 배열 맨 뒤로 옮겨서
+  // 마지막에(=가장 위에) 그려지게 한다. 실제 detections 배열 순서/인덱스는 그대로 두고
+  // "그리는 순서"만 바꾸는 것이므로 activeIndex 등 기존 로직은 손댈 필요 없다.
+  const renderOrder = useMemo(() => {
+    const order = detections.map((_, index) => index);
+    if (activeIndex !== null && activeIndex >= 0 && activeIndex < order.length) {
+      order.splice(order.indexOf(activeIndex), 1);
+      order.push(activeIndex);
+    }
+    return order;
+  }, [detections, activeIndex]);
+
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/5"
@@ -70,7 +83,8 @@ export function DetectionOverlay({
         role="img"
         aria-label={`검출된 알약 ${detections.length}개 표시`}
       >
-        {detections.map((detection, index) => {
+        {renderOrder.map((index) => {
+          const detection = detections[index];
           const [x1, y1, x2, y2] = detection.box;
           const isActive = activeIndex === index;
           const color = colorForClass(detection.class_id);
@@ -108,6 +122,18 @@ export function DetectionOverlay({
                 }
               }}
             >
+              {/* 히트 영역용 투명 사각형. 테두리(stroke)만 있는 rect는 fill="none"이라
+                  안쪽 면이 포인터 이벤트를 받지 못해서 테두리나 라벨을 정확히 짚어야만
+                  선택됐다. fill을 투명색으로 채우고 pointerEvents를 "fill"로 지정하면
+                  시각적으로는 그대로 투명하면서 박스 안쪽 전체가 클릭/호버 가능해진다. */}
+              <rect
+                x={x1}
+                y={y1}
+                width={Math.max(0, x2 - x1)}
+                height={Math.max(0, y2 - y1)}
+                fill="transparent"
+                style={{ pointerEvents: "fill" }}
+              />
               <rect
                 x={x1}
                 y={y1}
@@ -117,7 +143,7 @@ export function DetectionOverlay({
                 stroke={color}
                 strokeWidth={isActive ? strokeWidth * 1.8 : strokeWidth}
                 rx={width / 200}
-                style={{ transition: "stroke-width 120ms ease-out" }}
+                style={{ transition: "stroke-width 120ms ease-out", pointerEvents: "none" }}
               />
               <rect
                 x={labelX}
