@@ -8,7 +8,7 @@ export const maxDuration = 60;
 // 검출 서버 주소/토큰은 서버 환경변수로만 보관한다 (클라이언트 번들에 노출되지 않음).
 // .env.local에 값이 없으면 아래 기본값(현재 배포된 HF Space)을 사용한다.
 const PREDICT_API_URL =
-  process.env.PREDICT_API_URL ?? "https://joelchoi85-medication-detect.hf.space/predict";
+  process.env.PREDICT_API_URL ?? "https://joelchoi85-medication_detect.hf.space/predict";
 const PREDICT_API_TOKEN =
   process.env.PREDICT_API_TOKEN ?? "ULTRA-CAPSHYONG-3-TEAM-TOKEN-2026";
 

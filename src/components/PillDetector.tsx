@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DetectionList } from "@/components/DetectionList";
 import { DetectionOverlay } from "@/components/DetectionOverlay";
+import { DrugInfoPanel } from "@/components/DrugInfoPanel";
 import { FileDropzone } from "@/components/FileDropzone";
 import type { Detection, PredictResponse } from "@/lib/types";
 
@@ -33,6 +34,7 @@ export function PillDetector() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [threshold, setThreshold] = useState(DEFAULT_THRESHOLD);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [selectedDetection, setSelectedDetection] = useState<Detection | null>(null);
   const requestIdRef = useRef(0);
 
   // 언마운트 시 블롭 URL 해제
@@ -50,6 +52,7 @@ export function PillDetector() {
 
     setDetections([]);
     setActiveIndex(null);
+    setSelectedDetection(null);
     setErrorMessage(null);
     setStatus("loading");
 
@@ -95,6 +98,7 @@ export function PillDetector() {
     setDetections([]);
     setErrorMessage(null);
     setActiveIndex(null);
+    setSelectedDetection(null);
     setThreshold(DEFAULT_THRESHOLD);
   }
 
@@ -102,6 +106,10 @@ export function PillDetector() {
     () => detections.filter((d) => d.confidence >= threshold),
     [detections, threshold],
   );
+
+  function handleActivate(index: number) {
+    setSelectedDetection(filteredDetections[index] ?? null);
+  }
 
   const isBusy = status === "loading";
 
@@ -119,6 +127,7 @@ export function PillDetector() {
               detections={filteredDetections}
               activeIndex={activeIndex}
               onSelect={setActiveIndex}
+              onActivate={handleActivate}
             />
             <div className="flex flex-wrap items-center gap-3">
               <button
@@ -157,6 +166,7 @@ export function PillDetector() {
                       <span className="[font-variant-numeric:tabular-nums]">{filteredDetections.length}</span>개 표시 중
                     </>
                   )}
+                  {filteredDetections.length > 0 && " · 항목을 클릭하면 상세정보를 볼 수 있어요"}
                 </p>
               )}
             </div>
@@ -189,6 +199,15 @@ export function PillDetector() {
                 detections={filteredDetections}
                 activeIndex={activeIndex}
                 onSelect={setActiveIndex}
+                onActivate={handleActivate}
+              />
+            )}
+
+            {selectedDetection && (
+              <DrugInfoPanel
+                key={`${selectedDetection.class_id}-${selectedDetection.box.join(",")}`}
+                detection={selectedDetection}
+                onClose={() => setSelectedDetection(null)}
               />
             )}
           </div>

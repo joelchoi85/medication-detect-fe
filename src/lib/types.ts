@@ -20,3 +20,27 @@ export interface PredictErrorResponse {
 }
 
 export type PredictResponse = PredictSuccessResponse | PredictErrorResponse;
+
+export interface DrugInfo {
+  itemName: string;
+  entpName: string;
+  efficacy: string;
+  usage: string;
+  warning: string;
+  precautions: string;
+  interactions: string;
+  sideEffects: string;
+  storage: string;
+}
+
+export interface DrugInfoSuccessResponse {
+  success: true;
+  data: DrugInfo;
+}
+
+export interface DrugInfoErrorResponse {
+  success: false;
+  error: string;
+}
+
+export type DrugInfoResponse = DrugInfoSuccessResponse | DrugInfoErrorResponse;
