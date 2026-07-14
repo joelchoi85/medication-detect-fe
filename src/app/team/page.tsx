@@ -63,6 +63,12 @@ export default function TeamPage() {
           ULTRA CAPSHYONG ITEM WITH 4 VALUES
         </h1>
         <p className="text-sm text-foreground/60">Part2 Mission · 3팀</p>
+        {/* <Link
+          href="/script"
+          className="text-sm text-foreground/60 underline underline-offset-4 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+        >
+          발표 대본 보기 →
+        </Link> */}
       </header>
 
       <section
@@ -87,7 +93,7 @@ export default function TeamPage() {
                   <span
                     aria-label="팀장"
                     title="팀장"
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 text-2xl leading-none"
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 text-lg leading-none"
                   >
                     👑
                   </span>
