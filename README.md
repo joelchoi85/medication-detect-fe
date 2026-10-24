@@ -13,11 +13,11 @@ npm run dev
 
 ## 환경 변수
 
-`.env.local` (이미 기본값으로 채워져 있음, 필요시 수정):
+`.env.local` 을 만들고 아래 값을 넣는다 (토큰은 검출 서버에 설정한 값):
 
 ```
 PREDICT_API_URL=https://joelchoi85-medication-detect.hf.space/predict
-PREDICT_API_TOKEN=ULTRA-CAPSHYONG-3-TEAM-TOKEN-2026
+PREDICT_API_TOKEN=<검출 서버 토큰>
 ```
 
 검출 서버 주소/토큰은 `src/app/api/predict/route.ts`(서버 라우트)에서만 사용되며 클라이언트에는 노출되지 않습니다.
